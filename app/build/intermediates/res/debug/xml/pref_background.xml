@@ -1,0 +1,6 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference 
+        android:key="background_audio" 
+        android:title="@string/prefBackgroundData" 
+        android:enabled="true"/>
+</PreferenceScreen><!-- From: file:/home/robin/development/FoscamBabyMonitor/app/src/main/res/xml/pref_background.xml -->

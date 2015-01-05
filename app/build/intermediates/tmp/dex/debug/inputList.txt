@@ -1,0 +1,2 @@
+/home/robin/development/FoscamBabyMonitor/app/build/intermediates/classes/debug
+/home/robin/development/FoscamBabyMonitor/app/build/intermediates/pre-dexed/debug/support-v4-18.0.0-d16af3aeccda8f63e2041d8e017437ad9f4daeaa.jar

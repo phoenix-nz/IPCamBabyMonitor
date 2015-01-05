@@ -1,0 +1,66 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MonitorActivity" >
+
+    <LinearLayout
+        android:id="@+id/loadImage"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:visibility="gone" >
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|center"
+            android:layout_marginTop="50dp"
+            android:layout_weight="0"
+            android:indeterminate="true" />
+
+    </LinearLayout>
+
+       <ImageView
+           android:id="@+id/imagestream"
+           android:layout_width="fill_parent"
+           android:layout_height="0dip"
+           android:layout_weight="1"
+           android:adjustViewBounds="true"
+           android:contentDescription="@string/descImagestream"
+           android:scaleType="fitCenter"
+           android:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/tableRow2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" >
+
+            <ImageButton
+                android:id="@+id/toggleSound"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="switchAudio"
+                android:src="@drawable/device_access_volume_muted" />
+
+            <ImageButton
+                android:id="@+id/toggleMic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="switchMic"
+                android:src="@drawable/device_access_mic_muted" />
+            
+            <ImageButton
+                android:id="@+id/toggleIR"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="switchIR"
+                android:src="@drawable/device_access_bightness_low" />
+
+        </LinearLayout>
+
+</LinearLayout><!-- From: file:/home/robin/development/FoscamBabyMonitor/app/src/main/res/layout-port/activity_monitor.xml -->
