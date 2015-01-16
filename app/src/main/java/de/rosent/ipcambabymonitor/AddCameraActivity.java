@@ -13,6 +13,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 import android.support.v4.app.NavUtils;
 
+import de.rosent.ipcambabymonitor.cam.Camera;
+
 //import java.util.List;
 
 public class AddCameraActivity extends Activity {
@@ -111,14 +113,10 @@ public class AddCameraActivity extends Activity {
 	            if( editCamera != null ) {
 	            	ds.update(editCamera);
 	        	} else {
-	                Camera c = new Camera();
-	                c.setLabel(cameraLabelStr);
-	                c.setHost(cameraHostStr);
-	                c.setPort(cameraPortStr);
-	                c.setUsername(cameraUsernameStr);
-	                c.setPassword(cameraPasswordStr);
-	                int cameraId = ds.insert(c);
-	                c.setId(cameraId);
+                    // TODO - only Foscam Type hardcoded here
+                    Camera c = Camera.createCamera(-1, cameraHostStr, cameraPortStr, cameraUsernameStr, cameraPasswordStr, cameraLabelStr, 1, getApplicationContext() );
+                    int cameraId = ds.insert(c);
+                    c.setId(cameraId);
 	                finish();
 	            } 
         	} else {

@@ -21,6 +21,8 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.support.v4.app.NavUtils;
 
+import de.rosent.ipcambabymonitor.cam.Camera;
+
 public class SelectCameraActivity extends Activity {
     
 	ListView lvCamera;

@@ -13,6 +13,10 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 
+import de.rosent.ipcambabymonitor.cam.Camera;
+import de.rosent.ipcambabymonitor.cam.foscam.FoscamUtil;
+import de.rosent.ipcambabymonitor.cam.Alarm;
+
 public class AlarmChecker extends Service {
 	private NotificationManager nManager;
     private PowerManager		 pManager;
@@ -40,33 +44,21 @@ public class AlarmChecker extends Service {
     }
     
     @SuppressWarnings("deprecation")
-	private Notification createAlarmNotif( int alarmType ) {
-    	PendingIntent pIntent = PendingIntent.getActivity(context, 0, new Intent(context, MonitorActivity.class), BIND_AUTO_CREATE);
-		int icon = R.drawable.notif_passive;
-		if(alarmType > 0)
-			icon = R.drawable.notif_active;
-    	Notification notif = new Notification(icon, null, System.currentTimeMillis());
-    	switch(alarmType) {
-    	case FoscamUtil.AudioAlarm:
-    		notif.tickerText = getText(R.string.notifyAudioAlarm);
-    		notif.setLatestEventInfo(context, getText(R.string.notifyAudioAlarm), getText(R.string.notifyAlarm), pIntent);
-    		break;
-    	case FoscamUtil.MoveAlarm:
-    		notif.tickerText = getText(R.string.notifyMoveAlarm);
-    		notif.setLatestEventInfo(context, getText(R.string.notifyMoveAlarm), getText(R.string.notifyAlarm), pIntent);
-    		break;	
-    	case FoscamUtil.NoAlarm:
-    		notif.setLatestEventInfo(context, getText(R.string.notifyWatch), getText(R.string.notifyNoAlarm), pIntent);	
-    		break;
-    	default: //value == 3 WTF??
-    		notif.tickerText = getText(R.string.notifyMoveAlarm);
-    		notif.setLatestEventInfo(context, getText(R.string.notifyMoveAlarm), getText(R.string.notifyAlarm), pIntent);
-    		break;
-    	}
-		if (alarmType > 0 && alarmVibrate )
-			notif.vibrate = new long[] {0,500,50,500,50,500,50,500,50,500,50,500,50,1000};
-		if (alarmType > 0 && alarmSound != null)
-			 notif.sound = Uri.parse(alarmSound); 
+	private Notification createAlarmNotif( Alarm alarm ) {
+    	PendingIntent pIntent = PendingIntent.getActivity(context, 0, new Intent(context, MonitorActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Notification notif;
+        if(alarm != null) {
+            notif = new Notification(R.drawable.notif_active, alarm.getText(), System.currentTimeMillis());
+            notif.setLatestEventInfo(context, alarm.getText(), getText(R.string.notifyAlarm), pIntent);
+            if (alarmVibrate )
+                notif.vibrate = new long[] {0,500,50,500,50,500,50,500,50,500,50,500,50,1000};
+            if (alarmSound != null)
+                notif.sound = Uri.parse(alarmSound);
+        } else {
+            notif = new Notification(R.drawable.notif_passive, getText(R.string.notifyWatch), System.currentTimeMillis());
+            notif.setLatestEventInfo(context, getText(R.string.notifyWatch), getText(R.string.notifyNoAlarm), pIntent);
+        }
 		return notif;
     }
     
@@ -81,7 +73,7 @@ public class AlarmChecker extends Service {
 			activeCam = ds.getSelectedCamera();
 			if(activeCam != null) {
 				checkAlarm = true;
-				startForeground(startId, createAlarmNotif(0));
+				startForeground(startId, createAlarmNotif(null));
 	    		backgroundLock = pManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "FoscamBabyMonLock");
 				checkAlarmThrd = new Thread(iAlarmChecker);
 	    		checkAlarmThrd.start();
@@ -120,7 +112,7 @@ public class AlarmChecker extends Service {
 					if(!alarm) {
 	    				if(notif != null)
 	    					nManager.cancel(NOTIFICATION);
-	    				notif = createAlarmNotif(activeCam.getAlarmType());
+	    				notif = createAlarmNotif(activeCam.getAlarm());
 	    				nManager.notify(NOTIFICATION, notif);
 					}
 					alarm = true;
@@ -128,7 +120,7 @@ public class AlarmChecker extends Service {
 				} else {
 					if(alarm && nManager != null && notif != null) {
 						nManager.cancel(NOTIFICATION);
-						notif = createAlarmNotif(0);
+						notif = createAlarmNotif(null);
 	    				nManager.notify(NOTIFICATION, notif);
 					}
 					alarm = false;

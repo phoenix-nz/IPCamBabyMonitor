@@ -1,4 +1,4 @@
-package de.rosent.ipcambabymonitor;
+package de.rosent.ipcambabymonitor.cam.foscam;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -10,6 +10,8 @@ import javax.security.auth.login.LoginException;
 
 import android.content.Context;
 import android.util.Log;
+
+import de.rosent.ipcambabymonitor.R;
 
 public class FoscamInputStream extends DataInputStream {
     private static final String TAG = "FoscamInputStream";

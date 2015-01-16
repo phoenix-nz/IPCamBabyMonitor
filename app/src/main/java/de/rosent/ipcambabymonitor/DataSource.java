@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.database.sqlite.*;
 import java.util.ArrayList;
 
+import de.rosent.ipcambabymonitor.cam.Camera;
+
 /*
  * All of the database management happens in this class.
  */
@@ -85,7 +87,7 @@ public class DataSource extends SQLiteOpenHelper {
             Cursor cursor = db.query("tblCamera", new String[] { "_id", "host", "port", "username", "password", "camera_desc", "camera_type_id" }, "_id=?", new String[] { String.valueOf(selectedCamera) }, null, null, null, null);
             if (cursor != null) {
                 cursor.moveToFirst();
-                c = new Camera(Integer.parseInt(cursor.getString(0)), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4), cursor.getString(5), Integer.parseInt(cursor.getString(6)));
+                c = Camera.createCamera(Integer.parseInt(cursor.getString(0)), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4), cursor.getString(5), Integer.parseInt(cursor.getString(6)), this.context);
                 c.setSelected(true);
             }
             cursor.close();
@@ -99,7 +101,7 @@ public class DataSource extends SQLiteOpenHelper {
         Cursor cursor = db.query("tblCamera", new String[] { "_id", "host", "port", "username", "password", "camera_desc", "camera_type_id" }, "_id=?", new String[] { String.valueOf(id) }, null, null, null, null);
         if (cursor != null)
             cursor.moveToFirst();
-        Camera c = new Camera(Integer.parseInt(cursor.getString(0)), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4), cursor.getString(5), Integer.parseInt(cursor.getString(6)));
+        Camera c = Camera.createCamera(Integer.parseInt(cursor.getString(0)), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4), cursor.getString(5), Integer.parseInt(cursor.getString(6)), this.context);
         cursor.close();
         db.close();
         c.setSelected(true);
@@ -114,14 +116,7 @@ public class DataSource extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             do {
-                Camera c = new Camera();
-                c.setId(Integer.parseInt(cursor.getString(0)));
-                c.setHost(cursor.getString(1));
-                c.setPort(cursor.getString(2));
-                c.setUsername(cursor.getString(3));
-                c.setPassword(cursor.getString(4));
-                c.setLabel(cursor.getString(5));
-                c.setTypeId(Integer.parseInt(cursor.getString(6)));
+                Camera c = Camera.createCamera(Integer.parseInt(cursor.getString(0)), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4), cursor.getString(5), Integer.parseInt(cursor.getString(6)), this.context);
                 if (c.getId() == selectedCamera){
                 	c.setSelected(true);
                 }	else {

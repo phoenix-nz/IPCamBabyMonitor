@@ -19,6 +19,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import de.rosent.ipcambabymonitor.cam.Camera;
+
 public class MonitorActivity extends Activity {
 	private DataSource ds;
     private Camera activeCam;
@@ -125,7 +127,7 @@ public class MonitorActivity extends Activity {
 //        	}
         	
         	// Set Image Orientation
-        	activeCam.flip( flipVert, flipHoriz );
+        	activeCam.flipImage(flipVert, flipHoriz);
         	
         	// Watch Alarm
         	setCheckAlarm(checkAlarm);

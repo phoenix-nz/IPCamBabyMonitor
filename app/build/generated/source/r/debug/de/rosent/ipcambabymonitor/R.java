@@ -109,7 +109,8 @@ public final class R {
         public static final int title_activity_add_camera=0x7f050029;
         public static final int title_activity_select_camera=0x7f05002a;
         public static final int title_activity_settings=0x7f05002b;
-        public static final int warningEmptyFields=0x7f05002c;
+        public static final int unknownCameraType=0x7f05002c;
+        public static final int warningEmptyFields=0x7f05002d;
     }
     public static final class style {
         /** 

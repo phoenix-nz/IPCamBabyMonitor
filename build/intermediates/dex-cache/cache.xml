@@ -6,7 +6,7 @@
         jumboMode="false"
         revision="21.1.2"
         sha1="44ec51e9d395a47aab135e5e1b556c0007442156">
-        <dex dex="/home/robin/development/FoscamBabyMonitor/app/build/intermediates/pre-dexed/debug/support-v4-18.0.0-d16af3aeccda8f63e2041d8e017437ad9f4daeaa.jar" />
+        <dex dex="/home/robin/development/IPCamBabyMonitor/app/build/intermediates/pre-dexed/debug/support-v4-18.0.0-d16af3aeccda8f63e2041d8e017437ad9f4daeaa.jar" />
     </item>
 
 </items>

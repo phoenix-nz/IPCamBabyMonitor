@@ -1,4 +1,4 @@
-package de.rosent.ipcambabymonitor;
+package de.rosent.ipcambabymonitor.cam;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;

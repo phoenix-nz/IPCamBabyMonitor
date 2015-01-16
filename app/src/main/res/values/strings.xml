@@ -27,6 +27,7 @@
     <string name="labelIR">IR</string>
     <string name="labelMic">Micro</string>
     <string name="title_activity_add_camera">Add Camera</string>
+    <string name="unknownCameraType">Unknown Camera Type</string>
     
     <string name="notifyAlarm">ALARM</string>
     <string name="notifyNoAlarm">Monitor</string>

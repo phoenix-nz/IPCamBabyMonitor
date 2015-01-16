@@ -5,6 +5,8 @@ import android.widget.*;
 import android.view.*;
 import android.content.Context;
 
+import de.rosent.ipcambabymonitor.cam.Camera;
+
 public class CameraListAdapter extends BaseAdapter {
 
     private static ArrayList<Camera> cameraList;

@@ -1,4 +1,4 @@
-package de.rosent.ipcambabymonitor;
+package de.rosent.ipcambabymonitor.cam.foscam;
 
 import java.nio.ByteBuffer;
 
