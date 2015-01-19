@@ -1,17 +1,17 @@
-package de.rosent.ipcambabymonitor.cam.foscam;
+package de.rosent.ipcambabymonitor.cam.easyn.foscam;
+
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioTrack;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
-import android.media.AudioFormat;
-import android.media.AudioManager;
-import android.media.AudioTrack;
-
 import de.rosent.ipcambabymonitor.cam.foscam.FoscamUtil;
 
-public class FoscamAudioListener extends Thread {
+public class EasyNAudioParser extends Thread {
     private InputStream stream;
     private AudioTrack player;
 	private boolean running;
@@ -19,25 +19,25 @@ public class FoscamAudioListener extends Thread {
 	private int mContentLength = 0;
 	@SuppressWarnings("unused")
 	private int camTime = -1;
-	
-	private int[] ima_step_table = new int[] { 
-			  7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 
-			  19, 21, 23, 25, 28, 31, 34, 37, 41, 45, 
-			  50, 55, 60, 66, 73, 80, 88, 97, 107, 118, 
+
+	private int[] ima_step_table = new int[] {
+			  7, 8, 9, 10, 11, 12, 13, 14, 16, 17,
+			  19, 21, 23, 25, 28, 31, 34, 37, 41, 45,
+			  50, 55, 60, 66, 73, 80, 88, 97, 107, 118,
 			  130, 143, 157, 173, 190, 209, 230, 253, 279, 307,
 			  337, 371, 408, 449, 494, 544, 598, 658, 724, 796,
-			  876, 963, 1060, 1166, 1282, 1411, 1552, 1707, 1878, 2066, 
+			  876, 963, 1060, 1166, 1282, 1411, 1552, 1707, 1878, 2066,
 			  2272, 2499, 2749, 3024, 3327, 3660, 4026, 4428, 4871, 5358,
-			  5894, 6484, 7132, 7845, 8630, 9493, 10442, 11487, 12635, 13899, 
-			  15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767 
+			  5894, 6484, 7132, 7845, 8630, 9493, 10442, 11487, 12635, 13899,
+			  15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767
 			};
-    
+
 	private int[] ima_index_table = new int[] {
 			  -1, -1, -1, -1, 2, 4, 6, 8,
 			  -1, -1, -1, -1, 2, 4, 6, 8
 			};
-	
-    public FoscamAudioListener(InputStream stream) {
+
+    public EasyNAudioParser(InputStream stream) {
     	super();
     	this.stream = stream;
     	int bufferSize = AudioTrack.getMinBufferSize(8000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
@@ -61,13 +61,13 @@ public class FoscamAudioListener extends Thread {
 
 		running = true;
         while(running) {
-        	byte[] header = new byte[FoscamUtil.HeaderSize];
+        	byte[] header = new byte[EasyNUtil.HeaderSize];
             try {
             	stream.read(header);
             	//clear buffer if we are too slow...
             	if(stream.available() >= 2000) {
             		skipPacket = true;
-                	System.out.println( "AudioBuffer: " + stream.available() );
+                	//System.out.println( "AudioBuffer: " + stream.available() );
             	} else
             		skipPacket = false;
             } catch ( EOFException e ) {
@@ -77,7 +77,7 @@ public class FoscamAudioListener extends Thread {
             	return;
             }
             try {
-                mContentLength = FoscamUtil.parseContentLength(header);
+                mContentLength = EasyNUtil.parseContentLength(header);
             } catch (NumberFormatException nfe) { 
                 mContentLength = 0; 
             }
@@ -91,31 +91,19 @@ public class FoscamAudioListener extends Thread {
 		        	  frameData = null;
 			     }
             }
-            
-            
-            if(frameData != null) {
-            	// We have to remove all of the preamble
-            	// First four bytes = timestamp
-            	//frameData[0-3];
-            	// Next four bytes = sequence number
-            	//frameData[4-7];
-            	// The the camera timestamp - this could be useful later...
-            	byte[] tempTime = new byte[4];
-            	for (int i = 0; i < 4; i++)
-            		tempTime[3-i] = frameData[8+i];
-            	this.camTime = ByteBuffer.wrap(tempTime).getInt();
-            	// Make sure we are using ADPCM
-            	if (frameData[12] != 0) {
-            		// TODO useful message through to user?
-            		stopAudio();
-            		return;
-            	}
-            	// The next four bytes are always 160 - length of audio
-            	//frameData[13-16];
-            	
-            	audioData = new short[(frameData.length-17)*2];
+            // timestamp is also part of the header- this could also be useful later
+            // starts at position 6 to 12, but we only parse the latter 4 bytes
+            // who cares about precision anyway :-)
+            byte[] tempTime = new byte[4];
+            for (int i = 0; i < 4; i++)
+                tempTime[3-i] = frameData[4+i];
+            this.camTime = ByteBuffer.wrap(tempTime).getInt();
 
-            	for(int i = 17; i < frameData.length; i++) {
+            if(frameData != null) {
+
+            	audioData = new short[(frameData.length)*2];
+            	
+            	for(int i = 0; i < frameData.length; i++) {
             		val = frameData[i];
             		high = (val >> 4) & 0x0f;
             		low = val & 0x0f;

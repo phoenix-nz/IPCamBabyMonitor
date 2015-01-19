@@ -1,4 +1,7 @@
-package de.rosent.ipcambabymonitor.cam.foscam;
+package de.rosent.ipcambabymonitor.cam.easyn.foscam;
+
+import android.content.Context;
+import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -8,12 +11,9 @@ import java.io.InputStream;
 
 import javax.security.auth.login.LoginException;
 
-import android.content.Context;
-import android.util.Log;
-
 import de.rosent.ipcambabymonitor.R;
 
-public class FoscamInputStream extends DataInputStream {
+public class EasyNInputStream extends DataInputStream {
     private static final String TAG = "EasyNInputStream";
 
     private final static int HEADER_MAX_LENGTH = 23;
@@ -27,7 +27,7 @@ public class FoscamInputStream extends DataInputStream {
     private int      	alarmType   = 0;
     private long      	lastAlarmTime = 0;
     
-    public FoscamInputStream(InputStream in, Context context) {
+    public EasyNInputStream(InputStream in, Context context) {
         super(new BufferedInputStream(in, FRAME_MAX_LENGTH));
         this.context = context;
     }  
@@ -45,32 +45,32 @@ public class FoscamInputStream extends DataInputStream {
         if(onlyCheck && this.available() == 0) return -2;
     	mark(FRAME_MAX_LENGTH);
         reset();
-        byte[] header = new byte[FoscamUtil.HeaderSize];
+        byte[] header = new byte[EasyNUtil.HeaderSize];
         try {
-        	readFully(header);	
+        	readFully(header);
         } catch ( EOFException e ) {
         	// Do nothing.
         }
         try {
-            mContentLength = FoscamUtil.parseContentLength(header);
-        } catch (NumberFormatException nfe) { 
+            mContentLength = EasyNUtil.parseContentLength(header);
+        } catch (NumberFormatException nfe) {
             nfe.getStackTrace();
             Log.d(TAG, "catch NumberFormatException hit", nfe);
-            mContentLength = 0; 
+            mContentLength = 0;
         }
         byte[] frameData = null;
         if (mContentLength > 0) {
         	reset();
         	frameData = new byte[mContentLength];
-        	skipBytes(FoscamUtil.HeaderSize);
+        	skipBytes(EasyNUtil.HeaderSize);
         	readFully(frameData);
         }
         int retVal = parseFrame( header, frameData);
-        while ( retVal == FoscamUtil.KeepAlive || retVal == FoscamUtil.NotifyAlarm ) {
-        	if( retVal == FoscamUtil.NotifyAlarm) {
+        while ( retVal == EasyNUtil.KeepAlive || retVal == EasyNUtil.NotifyAlarm ) {
+        	if( retVal == EasyNUtil.NotifyAlarm) {
         		if(frameData[0] == 0) 	alarmActive = false;
         		else 				   	alarmActive = true;
-    			
+
         		alarmType = frameData[0];
         		lastAlarmTime = System.currentTimeMillis() + 30000;
         		mark(FRAME_MAX_LENGTH);
@@ -82,26 +82,26 @@ public class FoscamInputStream extends DataInputStream {
         if(onlyCheck) reset();
         return retVal;
     }
-    
+
     private int parseFrame( byte[] header, byte[] data) throws LoginException {
     	int retVal = -2;
-    	if ( header[3] == FoscamUtil.MO_O[3]) {
+    	if ( header[3] == EasyNUtil.MO_O[3]) {
     		// parse a command
-	    	switch(header[FoscamUtil.CommandPos]) {
-	    	case FoscamUtil.RespReqLogin:
+	    	switch(header[EasyNUtil.CommandPos]) {
+	    	case EasyNUtil.RespReqLogin:
 	    		if ( data[0] == 0 ) {
 	    			// Login request ok
 	    			// TODO store information like CamId?
-	    			retVal = header[FoscamUtil.CommandPos];
+	    			retVal = header[EasyNUtil.CommandPos];
 	    		} else {
 	    			// Cannot login
 	    			throw new LoginException(context.getResources().getString(R.string.MaxConnections));
 	    		}
 	    		break;
-	    	case FoscamUtil.RespAuthLogin:
+	    	case EasyNUtil.RespAuthLogin:
 	    		if ( data[0] == 0 ) {
 	    			// Login ok
-	    			retVal = header[FoscamUtil.CommandPos];
+	    			retVal = header[EasyNUtil.CommandPos];
 	    		} else if ( data[0] == 1) {
 	    			// Cannot login
 	    			throw new LoginException(context.getResources().getString(R.string.UnknownUser));
@@ -110,32 +110,32 @@ public class FoscamInputStream extends DataInputStream {
 	    			throw new LoginException(context.getResources().getString(R.string.UnknownPassword));
 	    		}
 	    		break;
-	    	case FoscamUtil.RespStartVideo:
-	    	case FoscamUtil.RespStartAudio:
-	    	case FoscamUtil.RespStartTalk:
+	    	case EasyNUtil.RespStartVideo:
+	    	case EasyNUtil.RespStartAudio:
+	    	case EasyNUtil.RespStartTalk:
 	        	if (data[0] == 0) {
 	    			// check if a connection ID exists:
 	        		for(int i = 2; i < data.length; i++)
 	        			this.connectionID[i-2] = data[i];
-	        		retVal = header[FoscamUtil.CommandPos];
+	        		retVal = header[EasyNUtil.CommandPos];
 	    		} else {
 	    			throw new LoginException(context.getResources().getString(R.string.MaxConnections));
 	    		} // TODO RespStartTalk also has a 7 return code - needs a different error...
 	    		break;
-	    	case FoscamUtil.RespUNKNOWN_2:
+	    	case EasyNUtil.RespUNKNOWN_2:
 	    		// TODO - what do we do with this?
 	    		break;
-	    	case FoscamUtil.NotifyAlarm:
-	    		retVal = header[FoscamUtil.CommandPos];
+	    	case EasyNUtil.NotifyAlarm:
+	    		retVal = header[EasyNUtil.CommandPos];
 	    		break;
 	    	default:
-	    		retVal = header[FoscamUtil.CommandPos];
+	    		retVal = header[EasyNUtil.CommandPos];
 	    	}
     	}
 	    else { //if (header[3] == EasyNUtil.MO_V[3] )
 	    	//parse data - currently only audio
 	    	// TODO video implementation of parsing?
-	    	if( header[FoscamUtil.CommandPos] == 2 ) {
+	    	if( header[EasyNUtil.CommandPos] == 2 ) {
 	    		// TODO audio implementation of parsing.
 	    	}
 	    	
